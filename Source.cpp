@@ -1,11 +1,12 @@
 #include <iostream>
+#include <vector> //Do klasy Obrabiarka
 
 class Czas {
 	private:
 		unsigned int sek, min, godz;
 	public:			
 		void format(){ //ustawia prawidlowy format czasu (sek;min;godz). Ogolnie ogarnia syf.
-			short unsigned int r, b;
+			short int r, b;
 			if (sek >= 60){
 				r = sek % 60;
 				b = (sek - r) / 60;
@@ -129,15 +130,16 @@ class Czas {
 		//przeciazenie operatorow
 		Czas operator + (Czas z1){ //dodanie dwoch obiektow (czas + czas)
 			Czas z2;
-			z2.setSek(z1.getSek() + sek);
-			z2.setMin(z1.getMin() + min);
 			z2.setGodz(z1.getGodz() + godz);
+			z2.setMin(z1.getMin() + min);
+			z2.setSek(z1.getSek() + sek);			
 			z2.format();
 			return z2;
 		}
 
 		void operator += (Czas z1){
 			*this = *this + z1;
+			//this->printCzas();
 		}
 
 		Czas operator + (int v){ //dodanie obiekt + int (czas + sekundy)
@@ -203,6 +205,34 @@ class Czas {
 		}
 };
 
+class Obrabiarka{
+	public:
+		std::vector<Czas> lista;
+		size_t getCount(){
+			return lista.size();
+		}
+		Czas getSum(){
+			Czas suma;
+			for(unsigned int i = 0; i < this->lista.size(); i++){
+				suma += this->lista.at(i);
+			}
+			return suma;
+		}
+
+		void printSum(){
+			std::cout << "Suma czasow obrabiarki: ";
+			Czas suma = this->getSum();
+			suma.printCzas();
+		}
+		
+		void printAll(){
+			std::cout << "Lista wszystkich czasow: " << std::endl;
+			for(auto a:lista){
+				a.printCzas();
+			}
+		}
+};
+
 int main() {
 	using namespace std;
 	Czas z1;
@@ -222,4 +252,10 @@ int main() {
 	if (z2 < z1){
 		cout << "z1 wiekszy" << endl;
 	}
+	Obrabiarka o1;
+	o1.lista.push_back(z1);
+	o1.lista.push_back(z2);
+	o1.printAll();
+	o1.printSum();
+	return 0;
 }
