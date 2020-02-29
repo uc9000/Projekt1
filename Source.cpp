@@ -1,26 +1,36 @@
 #include <iostream>
 #include <vector> //Do klasy Obrabiarka
+#include <stdexcept> //do zabezpieczen
 
 class Czas {
 	private:
 		unsigned int sek, min, godz;
-	public:			
+				
 		void format(){ //ustawia prawidlowy format czasu (sek;min;godz). Ogolnie ogarnia syf.
-			short int r, b;
+			short unsigned int r, b;
 			if (sek >= 60){
 				r = sek % 60;
-				b = (sek - r) / 60;
+				b = sek / 60;
 				min += b;
 				sek = r;
 			}
 			if (min >= 60){
 				r = min % 60;
-				b = (min - r) / 60;
+				b = min / 60;
 				godz += b;
 				min = r;
 			}
 		}
+		
+		void forceSetSek(int sek){
+			this->sek = (unsigned int)sek;
+		}
 
+		void forceSetMin(int min){
+			this->min = (unsigned int)min;
+		}
+
+	public:		
 		Czas(){ //domsylny konstruktor - wszystko ustawione na 0
 			sek = 0;
 			min = 0;
@@ -32,9 +42,9 @@ class Czas {
 				this->sek = (unsigned int)sek;
 				this->format();
 			}
-			else{
-				std::cout << "Wprowadzono niepoprawne dane. Obiekt utworzono z zerowymi paremetrami" << std::endl;
+			else{				
 				this->sek = 0;
+				std::cout << "Wprowadzono niepoprawne dane. Obiekt utworzono z zerowymi paremetrami" << std::endl;
 			}
 		}
 		
@@ -45,9 +55,9 @@ class Czas {
 				this->format();
 			}
 			else{
-				std::cout << "Wprowadzono niepoprawne dane. Obiekt utworzono z zerowymi paremetrami" << std::endl;
 				this->sek = 0;
 				this->min = 0;
+				std::cout << "Wprowadzono niepoprawne dane. Obiekt utworzono z zerowymi paremetrami" << std::endl;
 			}			
 		}
 		
@@ -59,22 +69,21 @@ class Czas {
 				this->format();
 			}
 			else{
-				std::cout << "Wprowadzono niepoprawne dane. Obiekt utworzono z zerowymi paremetrami" << std::endl;
 				this->sek = 0;
 				this->min = 0;
 				this->godz = 0;
+				std::cout << "Wprowadzono niepoprawne dane. Obiekt utworzono z zerowymi paremetrami" << std::endl;
 			}			
 		}		
 
-		//akcesory:
+		//akcesory:		
 		bool setSek(int sek) {
-			if (sek >= 0) {
-				this->sek = sek;
-				this->format();
+			if (sek >= 0 && sek < 60) {
+				this->sek = (unsigned int)sek;
 				return true;
 			}
 			else {
-				std::cout << "Czas moze przyjmowac tylko wartosci dodatnie" << std::endl;
+				std::cout << "Error: Wprowadzono liczbe poza zakresem (0 - 59)" << std::endl;
 				return false;
 			}			
 		}
@@ -84,13 +93,12 @@ class Czas {
 		}
 
 		bool setMin(int min) {
-			if (min >= 0) {
-				this->min = min;
-				this->format();
+			if (min >= 0 && min < 60) {
+				this->min = (unsigned int)min;
 				return true;
 			}
 			else {
-				std::cout << "Czas moze przyjmowac tylko wartosci dodatnie" << std::endl;
+				std::cout << "Error: Wprowadzono liczbe poza zakresem (0 - 59)" << std::endl;
 				return false;
 			}
 		}
@@ -101,8 +109,7 @@ class Czas {
 
 		bool setGodz(int godz) {
 			if (godz >= 0) {
-				this->godz = godz;
-				this->format();
+				this->godz = (unsigned int)godz;
 				return true;
 			}
 			else {
@@ -113,6 +120,12 @@ class Czas {
 
 		unsigned int getGodz() {
 			return godz;
+		}
+
+		void setCzas(int sek, int min, int godz){
+			this->godz = godz;
+			this->setMin(min);
+			this->setSek(sek);
 		}
 
 		//inne fajne funkcje
@@ -131,8 +144,8 @@ class Czas {
 		Czas operator + (Czas z1){ //dodanie dwoch obiektow (czas + czas)
 			Czas z2;
 			z2.setGodz(z1.getGodz() + godz);
-			z2.setMin(z1.getMin() + min);
-			z2.setSek(z1.getSek() + sek);			
+			z2.forceSetMin(z1.getMin() + min);
+			z2.forceSetSek(z1.getSek() + sek);			
 			z2.format();
 			return z2;
 		}
@@ -147,7 +160,7 @@ class Czas {
 			if (v < 0){
 				return z1;
 			}
-			z1.setSek(z1.getSek() + v);
+			z1.forceSetSek(this->getSek() + v);
 			z1.format();
 			return z1;
 		}
@@ -156,7 +169,7 @@ class Czas {
 			if (v < 0){
 				return;
 			}
-			this->setSek(this->getSek() + v);
+			this->sek += v;
 			this->format();
 		}
 
@@ -180,8 +193,6 @@ class Czas {
 			}
 			if(sek > z1.getSek()){
 				return true;
-			}else if(sek < z1.getSek()){
-				return false;
 			}
 			return false;
 		}
@@ -206,43 +217,85 @@ class Czas {
 };
 
 class Obrabiarka{
-	public:
-		std::vector<Czas> lista;
+	private:
+	std::vector<Czas> list;
+
+	public:		
 		size_t getCount(){
-			return lista.size();
+			return list.size();
 		}
 		Czas getSum(){
 			Czas suma;
-			for(unsigned int i = 0; i < this->lista.size(); i++){
-				suma += this->lista.at(i);
+			for(auto a : list){
+				suma += a;
 			}
 			return suma;
 		}
 
 		void printSum(){
-			std::cout << "Suma czasow obrabiarki: ";
+			std::cout << "Suma czasow obrabiarki: " << std::endl;
 			Czas suma = this->getSum();
 			suma.printCzas();
 		}
 		
 		void printAll(){
 			std::cout << "Lista wszystkich czasow: " << std::endl;
-			for(auto a:lista){
+			for(auto a : list){
 				a.printCzas();
+			}
+		}
+
+		void push(Czas z){
+			this->list.push_back(z);
+		}
+
+		void push(int sek, int min, int godz){
+			Czas z;
+			z.setCzas(sek, min, godz);
+			this->list.push_back(z);
+		}
+
+		void setAt(Czas z, int i){
+			try{
+				this->list.at(i) = z;
+			}
+			catch(const std::out_of_range& e){
+				std::cerr << "Error: Wprowadzenie danych poza dostepna pamiecia: " << e.what() << std::endl;
+			}
+		}
+
+		Czas getAt(int i){
+			try{
+				return this->list.at(i);
+			}
+			catch(const std::out_of_range& e){
+				std::cerr << "Error: Dane poza dostepna pamiecia: " << e.what() << std::endl;
+				Czas z(0,0,0);
+				return z;
+			}
+		}
+
+		void printAt(int i){
+			try{
+				this->list.at(i).printCzas();
+			}
+			catch(const std::out_of_range& e){
+				std::cerr << "Error: Tu nic nima: " << e.what() << std::endl;
 			}
 		}
 };
 
 int main() {
 	using namespace std;
+	//test klasy czas
 	Czas z1;
 	Czas z2(2312, 61, 2);
 	z1.setGodz(5);
-	z1.setMin(71);
-	z1.setSek(131);
+	z1.setMin(59);
+	z1.setSek(3);
 	z1.printCzas();
 	z2.printCzas();
-	z1 += z2;
+	z1 = z1 + z2;
 	z1.printCzas();
 	z1 += 125;
 	z1.printCzas();
@@ -252,10 +305,20 @@ int main() {
 	if (z2 < z1){
 		cout << "z1 wiekszy" << endl;
 	}
+	//test klasy obrabiarka
 	Obrabiarka o1;
-	o1.lista.push_back(z1);
-	o1.lista.push_back(z2);
+	o1.push(z1);
+	o1.push(z2);
+	z1.setCzas(13, 31, 1);
+	o1.push(z1);
+	z1.setCzas(14, 1, 0);
+	o1.push(z1);
+	o1.push(59, 59, 2);
+	cout << "Ilosc procesow: " << o1.getCount() << endl;
 	o1.printAll();
 	o1.printSum();
+	o1.printAt(100);
+	z2 = o1.getAt(101);
+	o1.printAt(3);
 	return 0;
 }
