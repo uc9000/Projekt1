@@ -239,11 +239,12 @@ class Obrabiarka{
 		std::vector<Czas> list;
 
 	public:	
-		Obrabiarka(){
-
-		}
 		Obrabiarka(const Obrabiarka& o){ //kontruktor kopiujacy
 			this->list = o.list;
+		}
+		
+		Obrabiarka(){
+
 		}
 		/*
 		~Obrabiarka(){
@@ -379,6 +380,5 @@ int main() {
 	o4.push(1232);
 	o4.push(153);
 	o4.push(2322);
-	o4.~Obrabiarka()
 	return 0;
 }
