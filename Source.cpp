@@ -1,6 +1,6 @@
-#include <iostream>
+#include <iostream> //Do klasy Czas
 #include <vector> //Do klasy Obrabiarka
-#include <stdexcept> //do zabezpieczen
+#include <stdexcept> //do zabezpieczen w klasie Obrabiarka
 
 class Czas {
 	private:
@@ -22,12 +22,21 @@ class Czas {
 			}
 		}
 		
+		//wymuszone ustawienie wartosci bez ograniczen
 		void forceSetSek(int sek){
-			this->sek = (unsigned int)sek;
+			if(sek >= 0){
+				this->sek = (unsigned int)sek;
+			}else{
+				this->sek = 0;
+			}			
 		}
 
 		void forceSetMin(int min){
-			this->min = (unsigned int)min;
+			if(sek >= 0){
+				this->min = (unsigned int)min;
+			}else{
+				this->min = 0;
+			}			
 		}
 
 	public:		
@@ -38,6 +47,8 @@ class Czas {
 		}
 		//reszta konstruktorow
 		Czas(int sek){
+			this->min = 0;
+			this->godz = 0;
 			if(sek >= 0){
 				this->sek = (unsigned int)sek;
 				this->format();
@@ -46,9 +57,11 @@ class Czas {
 				this->sek = 0;
 				std::cout << "Wprowadzono niepoprawne dane. Obiekt utworzono z zerowymi paremetrami" << std::endl;
 			}
+			
 		}
 		
 		Czas(int sek, int min){
+			this->godz = 0;
 			if(sek >= 0 && min >= 0){
 				this->sek = (unsigned int)sek;
 				this->min = (unsigned int)min;
@@ -72,9 +85,9 @@ class Czas {
 				this->sek = 0;
 				this->min = 0;
 				this->godz = 0;
-				std::cout << "Wprowadzono niepoprawne dane. Obiekt utworzono z zerowymi paremetrami" << std::endl;
-			}			
-		}		
+				std::cerr << "Wprowadzono niepoprawne dane. Obiekt utworzono z zerowymi paremetrami" << std::endl;
+			}
+		}
 
 		//akcesory:		
 		bool setSek(int sek) {
@@ -83,7 +96,7 @@ class Czas {
 				return true;
 			}
 			else {
-				std::cout << "Error: Wprowadzono liczbe poza zakresem (0 - 59)" << std::endl;
+				std::cerr << "Error: Wprowadzono liczbe poza zakresem (0 - 59)" << std::endl;
 				return false;
 			}			
 		}
@@ -98,7 +111,7 @@ class Czas {
 				return true;
 			}
 			else {
-				std::cout << "Error: Wprowadzono liczbe poza zakresem (0 - 59)" << std::endl;
+				std::cerr << "Error: Wprowadzono liczbe poza zakresem (0 - 59)" << std::endl;
 				return false;
 			}
 		}
@@ -126,6 +139,11 @@ class Czas {
 			this->godz = godz;
 			this->setMin(min);
 			this->setSek(sek);
+		}
+
+		void setCzas(int sek){
+			this->forceSetSek(sek);
+			this->format();
 		}
 
 		//inne fajne funkcje
@@ -218,50 +236,31 @@ class Czas {
 
 class Obrabiarka{
 	private:
-	std::vector<Czas> list;
+		std::vector<Czas> list;
 
-	public:		
+	public:	
+		Obrabiarka(){
+
+		}
+		Obrabiarka(const Obrabiarka& o){ //kontruktor kopiujacy
+			this->list = o.list;
+		}
+		/*
+		~Obrabiarka(){
+			list.clear(); //usuwa obiekty z vectora
+		}
+		*/
+
 		size_t getCount(){
 			return list.size();
 		}
+
 		Czas getSum(){
 			Czas suma;
 			for(auto a : list){
 				suma += a;
 			}
 			return suma;
-		}
-
-		void printSum(){
-			std::cout << "Suma czasow obrabiarki: " << std::endl;
-			Czas suma = this->getSum();
-			suma.printCzas();
-		}
-		
-		void printAll(){
-			std::cout << "Lista wszystkich czasow: " << std::endl;
-			for(auto a : list){
-				a.printCzas();
-			}
-		}
-
-		void push(Czas z){
-			this->list.push_back(z);
-		}
-
-		void push(int sek, int min, int godz){
-			Czas z;
-			z.setCzas(sek, min, godz);
-			this->list.push_back(z);
-		}
-
-		void setAt(Czas z, int i){
-			try{
-				this->list.at(i) = z;
-			}
-			catch(const std::out_of_range& e){
-				std::cerr << "Error: Wprowadzenie danych poza dostepna pamiecia: " << e.what() << std::endl;
-			}
 		}
 
 		Czas getAt(int i){
@@ -282,6 +281,54 @@ class Obrabiarka{
 			catch(const std::out_of_range& e){
 				std::cerr << "Error: Tu nic nima: " << e.what() << std::endl;
 			}
+		}
+
+		void printSum(){
+			std::cout << "Suma czasow obrabiarki: " << std::endl;
+			Czas suma = this->getSum();
+			suma.printCzas();
+		}
+		
+		void printAll(){			
+			if(this->list.size() == 0){
+				std::cout << "Lista jest pusta." << std::endl;
+				return;
+			}
+			std::cout << "Lista wszystkich czasow: " << std::endl;
+			for(auto a : list){
+				a.printCzas();
+			}
+		}
+
+		void push(Czas z){
+			this->list.push_back(z);
+		}
+
+		void push(int sek, int min, int godz){
+			Czas z(sek, min, godz);
+			this->list.push_back(z);
+		}
+
+		void push(int sek){
+			Czas z(sek);
+			this->list.push_back(z);
+		}
+
+		void setAt(Czas z, int i){
+			try{
+				this->list.at(i) = z;
+			}
+			catch(const std::out_of_range& e){
+				std::cerr << "Error: Wprowadzenie danych poza dostepna pamiecia: " << e.what() << std::endl;
+			}
+		}
+
+		void clear(){
+			this->list.clear();
+		}
+
+		void operator = (Obrabiarka o){
+			this->list = o.list;
 		}
 };
 
@@ -310,15 +357,28 @@ int main() {
 	o1.push(z1);
 	o1.push(z2);
 	z1.setCzas(13, 31, 1);
-	o1.push(z1);
-	z1.setCzas(14, 1, 0);
-	o1.push(z1);
-	o1.push(59, 59, 2);
+	o1.push(z1); //push istniejacego obiektu klasy Czas
+	o1.push(1342); //push w sekundach
+	o1.push(59, 59, 2);//push w docelowym foracie czasu
 	cout << "Ilosc procesow: " << o1.getCount() << endl;
 	o1.printAll();
 	o1.printSum();
-	o1.printAt(100);
+	o1.printAt(100);//sprawdzenie zabezpieczen
 	z2 = o1.getAt(101);
 	o1.printAt(3);
+	Obrabiarka o2(o1); //test kopiujacego konstr.
+	o2.printAll();
+	o1.clear();
+	o1.printAll();
+	o2.printAll();	
+	Obrabiarka o3;
+	o3 = o2; //test operatora przyspisania
+	//o2.~Obrabiarka();
+	o3.printAll();
+	Obrabiarka o4;
+	o4.push(1232);
+	o4.push(153);
+	o4.push(2322);
+	o4.~Obrabiarka()
 	return 0;
 }
