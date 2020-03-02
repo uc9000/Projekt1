@@ -2,7 +2,6 @@
 #include <vector> //Do klasy Obrabiarka
 #include <stdexcept> //do zabezpieczen w klasie Obrabiarka
 
-
 class Czas {
 	private:
 		unsigned int sek, min, godz;
@@ -193,24 +192,24 @@ class Czas {
 		}
 
 		bool operator == (Czas z1){
-			if(sek == z1.getSek() && min == z1.getMin() && godz == z1.getGodz()){
+			if(this->sek == z1.sek && this->min == z1.min && this->godz == z1.godz){
 				return true;
 			}
 			return false;
 		}
 
 		bool operator > (Czas z1){
-			if(godz > z1.getGodz()){
+			if(this->godz > z1.godz){
 				return true;
-			}else if(godz < z1.getGodz()){
+			}else if(this->godz < z1.godz){
 				return false;
 			}
-			if(min > z1.getMin()){
+			if(this->min > z1.min){
 				return true;
-			}else if(min < z1.getMin()){
+			}else if(this->min < z1.min){
 				return false;
 			}
-			if(sek > z1.getSek()){
+			if(this->sek > z1.sek){
 				return true;
 			}
 			return false;
@@ -304,6 +303,12 @@ class Obrabiarka{
 			this->list.push_back(z);
 		}
 
+		void pop(){
+			if(this->list.size() > 1){
+				this->list.pop_back();
+			}		
+		}
+
 		void push(int sek, int min, int godz){
 			Czas z = Czas(sek, min, godz);
 			this->list.push_back(z);
@@ -332,6 +337,22 @@ class Obrabiarka{
 			for (int i = 0; i < n; i++){
 				this->push(o.getAt(i));
 			}
+		}
+
+		Obrabiarka getLimited(Czas z){
+			Obrabiarka o;		
+			for (int i = 0; (o.getSum() < z) && (i < (int)this->list.size()); i++){				
+				o.push(this->getAt(i));
+			}
+			if(z < o.getSum()){
+				o.pop();
+			}
+			return o;
+		}
+
+		Obrabiarka getLimited(int sek, int min, int godz){
+			Czas z = Czas(sek, min, godz);
+			return getLimited(z);
 		}
 
 		void operator = (Obrabiarka o){
@@ -391,5 +412,14 @@ int main() {
 	cout << "o1 po skopiowaniu n elementow z o3: " << endl;	
 	o1.cpy(o3, 3);
 	o1.printAll();
+	o3.push(34,23,5);	
+	cout << "Obiekt o3: " << endl;
+	o3.printAll();
+	z1.setCzas(23, 45, 13);
+	o2 = o3.getLimited(z1);
+	cout << "z1: " << endl;
+	z1.printCzas();
+	cout << "o2 = o3 ograniczone do z1:" << endl;
+	o2.printAll();
 	return 0;
 }
