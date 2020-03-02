@@ -2,6 +2,7 @@
 #include <vector> //Do klasy Obrabiarka
 #include <stdexcept> //do zabezpieczen w klasie Obrabiarka
 
+
 class Czas {
 	private:
 		unsigned int sek, min, godz;
@@ -244,14 +245,12 @@ class Obrabiarka{
 		}
 		
 		Obrabiarka(){
-
 		}
-		/*
-		~Obrabiarka(){
+		
+		~Obrabiarka(){		
 			list.clear(); //usuwa obiekty z vectora
 		}
-		*/
-
+		
 		size_t getCount(){
 			return list.size();
 		}
@@ -270,7 +269,7 @@ class Obrabiarka{
 			}
 			catch(const std::out_of_range& e){
 				std::cerr << "Error: Dane poza dostepna pamiecia: " << e.what() << std::endl;
-				Czas z(0,0,0);
+				Czas z = Czas(0,0,0);
 				return z;
 			}
 		}
@@ -306,12 +305,12 @@ class Obrabiarka{
 		}
 
 		void push(int sek, int min, int godz){
-			Czas z(sek, min, godz);
+			Czas z = Czas(sek, min, godz);
 			this->list.push_back(z);
 		}
 
 		void push(int sek){
-			Czas z(sek);
+			Czas z = Czas(sek);
 			this->list.push_back(z);
 		}
 
@@ -326,6 +325,13 @@ class Obrabiarka{
 
 		void clear(){
 			this->list.clear();
+		}		
+
+		void cpy(Obrabiarka o, int n){
+			this->clear();
+			for (int i = 0; i < n; i++){
+				this->push(o.getAt(i));
+			}
 		}
 
 		void operator = (Obrabiarka o){
@@ -337,7 +343,7 @@ int main() {
 	using namespace std;
 	//test klasy czas
 	Czas z1;
-	Czas z2(2312, 61, 2);
+	Czas z2 = Czas(2312, 61, 2);
 	z1.setGodz(5);
 	z1.setMin(59);
 	z1.setSek(3);
@@ -362,23 +368,28 @@ int main() {
 	o1.push(1342); //push w sekundach
 	o1.push(59, 59, 2);//push w docelowym foracie czasu
 	cout << "Ilosc procesow: " << o1.getCount() << endl;
+	cout << "Obiekt o1: " << endl;
 	o1.printAll();
 	o1.printSum();
 	o1.printAt(100);//sprawdzenie zabezpieczen
 	z2 = o1.getAt(101);
 	o1.printAt(3);
-	Obrabiarka o2(o1); //test kopiujacego konstr.
+	cout << "Obiekt o2 utworzony na podstawie o1 " << endl;
+	Obrabiarka o2 = Obrabiarka(o1); //test kopiujacego konstr.
 	o2.printAll();
 	o1.clear();
+	cout << "Obiekt o1 po wyczyszczeniu: " << endl;
 	o1.printAll();
+	cout << "Obiekt o2: " << endl;
 	o2.printAll();	
 	Obrabiarka o3;
-	o3 = o2; //test operatora przyspisania
-	//o2.~Obrabiarka();
+	cout << "Utworzenie o3 przy pomocy operatora = : " << endl;
+	o3 = o2; //test operatora przypisania
 	o3.printAll();
-	Obrabiarka o4;
-	o4.push(1232);
-	o4.push(153);
-	o4.push(2322);
+	cout << "o1 : " << endl;
+	o1.printAll();
+	cout << "o1 po skopiowaniu n elementow z o3: " << endl;	
+	o1.cpy(o3, 3);
+	o1.printAll();
 	return 0;
 }
