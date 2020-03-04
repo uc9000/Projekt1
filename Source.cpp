@@ -1,6 +1,8 @@
 #include <iostream> //Do klasy Czas
 #include <vector> //Do klasy Obrabiarka
 #include <stdexcept> //do zabezpieczen w klasie Obrabiarka
+#include <string>
+#include <cctype>
 
 class Czas {
 	private:
@@ -96,7 +98,7 @@ class Czas {
 				return true;
 			}
 			else {
-				std::cerr << "Error: Wprowadzono liczbe poza zakresem (0 - 59)" << std::endl;
+				std::cerr << "Error: Wprowadzono liczbe poza zakresem (0 - 59)" << std::endl << "Podaj wartosc jeszcze raz: " << std::endl;
 				return false;
 			}			
 		}
@@ -111,7 +113,7 @@ class Czas {
 				return true;
 			}
 			else {
-				std::cerr << "Error: Wprowadzono liczbe poza zakresem (0 - 59)" << std::endl;
+				std::cerr << "Error: Wprowadzono liczbe poza zakresem (0 - 59)" << std::endl << "Podaj wartosc jeszcze raz: " << std::endl;
 				return false;
 			}
 		}
@@ -126,7 +128,7 @@ class Czas {
 				return true;
 			}
 			else {
-				std::cout << "Czas moze przyjmowac tylko wartosci dodatnie" << std::endl;
+				std::cout << "Czas moze przyjmowac tylko wartosci dodatnie" << std::endl << "Podaj wartosc jeszcze raz: " << std::endl;
 				return false;
 			}
 		}
@@ -146,7 +148,7 @@ class Czas {
 			this->format();
 		}
 
-		//inne fajne funkcje
+		//inne fajne <s>funkcje</s> metody
 		void zero(){
 			sek = 0;
 			min = 0;
@@ -293,7 +295,7 @@ class Obrabiarka{
 				std::cout << "Lista jest pusta." << std::endl;
 				return;
 			}
-			std::cout << "Lista wszystkich czasow: " << std::endl;
+			std::cout << "Lista czasow: " << std::endl;
 			for(auto a : list){
 				a.printCzas();
 			}
@@ -333,8 +335,16 @@ class Obrabiarka{
 		}		
 
 		void cpy(Obrabiarka o, int n){
+			if (n <= 0){
+				std::cerr << "Error: Nalezy podac conajmniej 1 czas" << std::endl
+				<< "Nie skopiowana zadnego czasu!" << std::endl;
+			}
+			if (n >= (int)o.getCount()){
+				std::cerr << "Error: Zadano wiecej czasow niz jest dostepnych na liscie. " << std::endl 
+				<< "Zostana skopiowane wszystkie dostepne czasy" << std::endl;
+			}
 			this->clear();
-			for (int i = 0; i < n; i++){
+			for (int i = 0; i < n && i < (int)o.getCount(); i++){
 				this->push(o.getAt(i));
 			}
 		}
@@ -360,7 +370,46 @@ class Obrabiarka{
 		}
 };
 
-int main() {
+//funkcje wejscia
+long int dajInt(){
+	using namespace std;
+	const int sizeLimit = 5;
+	string str;
+	while(true){
+		cin >> str;
+		if((int)str.size() > sizeLimit){
+			cerr << "Liczba jest za dluga. Podaj liczbe calkowita: " << endl;
+			continue;
+		}
+		for (int i = 0; i < (int)str.size(); i++){
+			if(!(isdigit(str[i]) || str[i] == '-')){
+				cerr << "Podaj liczbe calkowita: ";
+				continue;
+			}
+		}
+		break;
+	}
+	return stoi(str);
+}
+
+bool takCzyNie(){
+	using namespace std;
+	int q;
+	while(true){
+		cout << "	1) Tak\n	2) Nie" << endl;
+		q = dajInt();
+		if(q == 1)
+			return true;
+		else if(q == 2)
+			return false;
+		else
+			continue;
+	}
+	return false;
+}
+
+//testowanie metod, konstruktorow, operatorow itd. klas Czas i Obrabiarka
+void test() {
 	using namespace std;
 	//test klasy czas
 	Czas z1;
@@ -421,5 +470,105 @@ int main() {
 	z1.printCzas();
 	cout << "o2 = o3 ograniczone do z1:" << endl;
 	o2.printAll();
+	//return 0;
+}
+
+void test2(){
+	using namespace std;
+	Obrabiarka o;
+	Obrabiarka kopia;
+	o.push(30, 1, 0);
+	o.push(15, 30, 1);
+	o.push(15, 45, 2);
+	o.push(23, 54, 1);
+	o.push(43, 21, 7);
+	o.push(29, 1, 3);
+	cout << "Lista czasow dodanych \"na sztywno\" : " << endl;
+	o.printAll();
+	cout << "Ile pierwszych czasow chcesz skopiowac? : ";
+	kopia.cpy(o, dajInt());
+	cout << "Skopiowana ";
+	kopia.printAll();
+	cout << "Koniec testu" << endl << endl;
+}
+
+void test3(){
+	using namespace std;
+	Czas z;
+	Obrabiarka o;
+	Obrabiarka kopia;	
+	o.push(30, 1, 0);
+	o.push(15, 30, 1);
+	o.push(15, 45, 2);
+	o.push(23, 54, 1);
+	o.push(43, 21, 7);
+	o.push(29, 1, 3);
+	cout << "Lista czasow dodanych \"na sztywno\" : " << endl;
+	o.printAll();
+	cout << "Suma tych czasow to : " << endl;
+	o.printSum();
+	cout << "Podaj wartosci czasu do ktorego ma byc ograniczona kopia: " << endl << "Ilosc sekund: ";
+	while(!z.setSek(dajInt())){}
+	cout << "Ilosc minut: ";
+	while(!z.setMin(dajInt())){}
+	cout << "Ilosc godzin: ";
+	while(!z.setGodz(dajInt())){}
+	cout << "Wprowadzono czas o wartosci : ";
+	z.printCzas();
+	kopia = o.getLimited(z);
+	cout << "Skopiowana lista czasow ograniczona do podanego czasu: " << endl;
+	kopia.printAll();
+	cout << "Suma tych czasow to : " << endl;
+	kopia.printSum();
+	cout << "Koniec testu." << endl << endl;
+}
+
+void menu(){
+	using namespace std;
+	int w = 0;
+	while(w != -1){
+		switch(w){
+			case 0:
+				cout << "Wybierz opcje: " << endl;
+				cout << "1) Ogolny test podstawowych metod/operatorow klasy Czas i Obrabiarka." << endl;
+				cout << "2) Test kopii obrabiarki (n pierwszych czasow)" << endl;
+				cout << "3) Test kopii obrabiarki (ograniczone do podanego czasu) " << endl;
+				cout << "4) Zakoncz " << endl;
+				while(true){
+					w = dajInt();
+					if(w >= 1 && w <= 4){
+						break;
+					}
+					cout << "Podaj liczbe od 1 do 4 : ";
+					continue;
+				}
+				break;
+			case 1:
+				test();
+				w = 0;
+				break;
+			case 2:
+				test2();
+				w = 0;
+				break;
+			case 3:
+				test3();
+				w = 0;
+				break;
+			case 4:
+				cout << "Czy napewno chcesz zakonczyc program? " << endl;
+				if(takCzyNie()){
+					w = -1;
+					break;
+				}
+				w = 0;				
+				break;
+		}
+	}
+}
+
+int main(){
+	menu();
+	std::cout << "Koniec dzialania programu" << std::endl;
 	return 0;
 }
