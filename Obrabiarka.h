@@ -1,4 +1,5 @@
-#pragma once
+#ifndef OBRABIARKA_H
+#define OBRABIARKA_H
 #include "Czas.h"
 #include <vector> //Do klasy Obrabiarka
 #include <stdexcept> //do zabezpieczen w klasie Obrabiarka
@@ -30,3 +31,5 @@ public:
 		this->list = o.list;
 	}
 };
+
+#endif

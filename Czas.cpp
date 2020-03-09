@@ -1,5 +1,4 @@
 #include "Czas.h"
-#pragma once
 void Czas::format() { //ustawia prawidlowy format czasu (sek;min;godz). Ogolnie ogarnia syf.
 	short unsigned int r, b;
 	if (sek >= 60) {
@@ -151,87 +150,81 @@ void Czas::printCzas() {
 	this->format();
 	std::cout << "Sekundy: " << getSek() << " Minuty: " << getMin() << " Godziny: " << getGodz() << std::endl;
 }
-    //przeciazenie operatorow
-    Czas operator + (Czas c1){ //dodanie dwoch obiektow (czas + czas)
-        Czas c2;
-        c2.godziny = c2.godziny + c1.godziny;
-        c2.minuty = c2.minuty + c1.minuty;
-        c2.sekundy = c2.sekundy + c1.sekundy;
-        if(c2.sekundy >= 60){
-            c2.minuty += sekundy / 60;
-            c2.sekundy = sekundy % 60;
-        }
-        if(c2.minuty >= 60){
-            c2.godziny += minuty / 60;
-            c2.minuty = minuty % 60;
-        }
-        return c2;
-    }
 
-    void operator += (Czas c1){
-        *this = *this + c1;
-    }
 
-    Czas operator + (int x){ //dodanie obiekt + int (czas + sekundy)
-        Czas c1 = Czas(*this);
-        if (x < 0){
-            return c1;
-        }
-        c1.sekundy += x;        
-        if(c1.sekundy >= 60){
-            c1.minuty += sekundy / 60;
-            c1.sekundy = sekundy % 60;
-        }
-        if(c1.minuty >= 60){
-            c1.godziny += minuty / 60;
-            c1.minuty = minuty % 60;
-        }
-        return c1;
-    }
 
-    void operator += (int x){
-        *this = *this + x;
-    }
+Czas Czas::operator + (Czas z1) { //dodanie dwoch obiektow (czas + czas)
+	Czas z2;
+	z2.setGodz(z1.getGodz() + godz);
+	z2.forceSetMin(z1.getMin() + min);
+	z2.forceSetSek(z1.getSek() + sek);
+	z2.format();
+	return z2;
+}
 
-    bool operator == (Czas c1){
-        if(sekundy == c1.sekundy && minuty == c1.minuty && godziny == c1.godziny){
-            return true;
-        }
-        return false;
-    }
+void Czas::operator += (Czas z1) {
+	*this = *this + z1;
+	//this->printCzas();
+}
 
-    bool operator > (Czas c1){
-        if(godziny > c1.godziny){
-            return true;
-        }else if(godziny < c1.godziny){
-            return false;
-        }
-        if(minuty > c1.minuty){
-            return true;
-        }else if(minuty < c1.minuty){
-            return false;
-        }
-        if(sekundy > c1.sekundy){
-            return true;
-        }
-        return false;
-    }
+Czas Czas::operator + (int v) { //dodanie obiekt + int (czas + sekundy)
+	Czas z1(*this);
+	if (v < 0) {
+		return z1;
+	}
+	z1.forceSetSek(this->getSek() + v);
+	z1.format();
+	return z1;
+}
 
-    bool operator <= (Czas z1){
-        if (*this < z1 || *this == z1){
-            return true;
-        }
-        return false;
-    }
+void Czas::operator += (int v) {
+	if (v < 0) {
+		return;
+	}
+	this->sek += v;
+	this->format();
+}
 
-    bool operator >= (Czas z1){
-        if (*this > z1 || *this == z1){
-            return true;
-        }
-        return false;
-    }
+bool Czas::operator == (Czas z1) {
+	if (this->sek == z1.sek && this->min == z1.min && this->godz == z1.godz) {
+		return true;
+	}
+	return false;
+}
 
-    bool operator < (Czas z1){
-        return !(*this >= z1);
-    }
-};
+bool Czas::operator > (Czas z1) {
+	if (this->godz > z1.godz) {
+		return true;
+	}
+	else if (this->godz < z1.godz) {
+		return false;
+	}
+	if (this->min > z1.min) {
+		return true;
+	}
+	else if (this->min < z1.min) {
+		return false;
+	}
+	if (this->sek > z1.sek) {
+		return true;
+	}
+	return false;
+}
+
+bool Czas::operator < (Czas z1) {
+	return !(*this > z1);
+}
+
+bool Czas::operator <= (Czas z1) {
+	if (*this < z1 || *this == z1) {
+		return true;
+	}
+	return false;
+}
+
+bool Czas::operator >= (Czas z1) {
+	if (*this > z1 || *this == z1) {
+		return true;
+	}
+	return false;
+}

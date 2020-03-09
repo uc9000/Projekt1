@@ -1,5 +1,4 @@
 #include "Obrabiarka.h"
-#pragma once
 
 Obrabiarka::Obrabiarka(const Obrabiarka& o) { //kontruktor kopiujacy
 	this->list = o.list;
