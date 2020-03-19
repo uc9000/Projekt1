@@ -95,11 +95,11 @@ void Obrabiarka::clear() {
 
 void Obrabiarka::cpy(Obrabiarka o, int n) {
 	if (n <= 0) {
-		std::cerr << "Error: Nalezy podac conajmniej 1 czas" << std::endl
+		std::cerr << "Warning: Nalezy podac conajmniej 1 czas" << std::endl
 			<< "Nie skopiowana zadnego czasu!" << std::endl;
 	}
 	if (n >= (int)o.getCount()) {
-		std::cerr << "Error: Zadano wiecej czasow niz jest dostepnych na liscie. " << std::endl
+		std::cerr << "Warning: Zadano wiecej czasow niz jest dostepnych na liscie. " << std::endl
 			<< "Zostana skopiowane wszystkie dostepne czasy" << std::endl;
 	}
 	this->clear();

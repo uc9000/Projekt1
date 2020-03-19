@@ -1,5 +1,5 @@
 #include "Czas.h"
-void Czas::format() { //ustawia prawidlowy format czasu (sek;min;godz). Ogolnie ogarnia syf.
+void Czas::format() { //ustawia prawidlowy format czasu (sek;min;godz).
 	short unsigned int r, b;
 	if (sek >= 60) {
 		r = sek % 60;
@@ -33,11 +33,13 @@ void Czas::forceSetMin(int min) {
 		this->min = 0;
 	}
 }
+
 Czas::Czas() { //domsylny konstruktor - wszystko ustawione na 0
 	sek = 0;
 	min = 0;
 	godz = 0;
 }
+
 //reszta konstruktorow
 Czas::Czas(int sek) {
 	this->min = 0;
@@ -48,7 +50,7 @@ Czas::Czas(int sek) {
 	}
 	else {
 		this->sek = 0;
-		std::cout << "Wprowadzono niepoprawne dane. Obiekt utworzono z zerowymi paremetrami" << std::endl;
+		std::cerr << "Wprowadzono niepoprawne dane. Obiekt utworzono z zerowymi paremetrami" << std::endl;
 	}
 
 }
@@ -63,7 +65,7 @@ Czas::Czas(int sek, int min) {
 	else {
 		this->sek = 0;
 		this->min = 0;
-		std::cout << "Wprowadzono niepoprawne dane. Obiekt utworzono z zerowymi paremetrami" << std::endl;
+		std::cerr << "Wprowadzono niepoprawne dane. Obiekt utworzono z zerowymi paremetrami" << std::endl;
 	}
 }
 
@@ -150,8 +152,6 @@ void Czas::printCzas() {
 	this->format();
 	std::cout << "Sekundy: " << getSek() << " Minuty: " << getMin() << " Godziny: " << getGodz() << std::endl;
 }
-
-
 
 Czas Czas::operator + (Czas z1) { //dodanie dwoch obiektow (czas + czas)
 	Czas z2;
